@@ -7,14 +7,6 @@ if(NOT TARGET imgui)
     set_target_properties(imgui PROPERTIES FOLDER ${third_party_folder}/imgui)
 endif()
 
-if(NOT TARGET glm)
-    option(BUILD_STATIC_LIBS "" ON)
-    option(BUILD_TESTING "" OFF)
-    option(GLM_TEST_ENABLE "" OFF)
-    add_subdirectory(glm)
-    set_target_properties(glm_static PROPERTIES FOLDER ${third_party_folder}/glm)
-endif()
-
 if(NOT TARGET glfw)
     option(GLFW_BUILD_EXAMPLES "" OFF)
     option(GLFW_BUILD_TESTS "" OFF)
@@ -70,4 +62,13 @@ if(NOT TARGET Jolt)
             MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
     endif()
 
+endif()
+
+if(NOT TARGET sol2)
+    add_subdirectory(sol2-3.3.0)
+endif()
+
+
+if(NOT TARGET lua)
+    include(lua.cmake)
 endif()

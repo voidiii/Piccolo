@@ -38,6 +38,7 @@ namespace Piccolo
         m_target_position = transform_component->getPosition();
     }
 
+    void MotorComponent::getOffStuckDead() { LOG_INFO("Some get off stuck dead logic"); }
     MotorComponent::~MotorComponent()
     {
         if (m_controller_type == ControllerType::physics)
@@ -86,6 +87,7 @@ namespace Piccolo
         bool has_move_command = ((unsigned int)GameCommand::forward | (unsigned int)GameCommand::backward |
                                  (unsigned int)GameCommand::left | (unsigned int)GameCommand::right) &
                                 command;
+        has_move_command &= ((unsigned int)GameCommand::free_carema & command) == 0;
         bool has_sprint_command = (unsigned int)GameCommand::sprint & command;
 
         bool  is_acceleration    = false;
