@@ -20,6 +20,7 @@ namespace Piccolo
         virtual ~Controller() = default;
 
         virtual Vector3 move(const Vector3& current_position, const Vector3& displacement) = 0;
+        virtual bool getGroundState() = 0;
     };
 
     class CharacterController : public Controller
@@ -29,9 +30,11 @@ namespace Piccolo
         ~CharacterController() = default;
 
         Vector3 move(const Vector3& current_position, const Vector3& displacement) override;
+        bool getGroundState() { return m_is_touch_ground; };
 
     private:
         Capsule        m_capsule;
         RigidBodyShape m_rigidbody_shape;
+        bool           m_is_touch_ground;
     };
 } // namespace Piccolo

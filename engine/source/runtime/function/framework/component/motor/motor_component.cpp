@@ -71,6 +71,12 @@ namespace Piccolo
 
         if (command >= (unsigned int)GameCommand::invalid)
             return;
+        
+        if (!m_controller->getGroundState() && m_jump_state == JumpState::idle) {
+            m_jump_state = JumpState::falling;
+        } else if (m_controller->getGroundState()) {
+            m_jump_state = JumpState::idle;
+        }
 
         calculatedDesiredHorizontalMoveSpeed(command, delta_time);
         calculatedDesiredVerticalMoveSpeed(command, delta_time);

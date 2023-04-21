@@ -12,7 +12,7 @@ namespace Piccolo
     void LuaComponent::tick(float delta_time)
     {
         // LOG_INFO(m_lua_script);
-        m_lua_state.script(m_lua_script);
+        //m_lua_state.script(m_lua_script);
     }
 
 } // namespace Piccolo
