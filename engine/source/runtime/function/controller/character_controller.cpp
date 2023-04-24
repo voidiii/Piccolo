@@ -79,22 +79,30 @@ namespace Piccolo
             horizontal_displacement.length(),
             hits))
         {
-            Vector3 silde_direction = displacement_direction;
+            Vector3 silde_direction = horizontal_direction;
             bool stuck = false;
             //float step_height = -0.5f;
             for(auto hit : hits) {
                 // keep getting the projection along the planes with normals, normalise it for direction only
-                silde_direction = silde_direction.project(hit.hit_normal).normalisedCopy();
+                silde_direction = silde_direction.project(hit.hit_normal);
+                silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
             }
             Vector3 slide_displacement = silde_direction * displacement.dotProduct(silde_direction);
             hits.clear();
-            if(physics_scene->raycast(
-                current_position,
+            if(!physics_scene->sweep(
+                m_rigidbody_shape,
+                world_transform.getMatrix(),
                 silde_direction,
                 slide_displacement.length(),
-                hits)) 
+                hits))
             {
-                final_position += silde_direction * displacement.dotProduct(silde_direction);
+                final_position += slide_displacement;
+            } else {
+                for(auto hit : hits) {
+                    if (std::abs(hit.hit_normal.z) > 0.9f || std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f) {
+                        final_position += slide_displacement;
+                    }
+                }
             }
         }
         else

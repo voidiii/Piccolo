@@ -44,4 +44,15 @@ namespace Piccolo
         float m_radius {0.3f};
         float m_half_height {0.7f};
     };
+
+    REFLECTION_TYPE(Slide_Capsule)
+    CLASS(Slide_Capsule : public Geometry, Fields)
+    {
+        REFLECTION_BODY(Slide_Capsule);
+
+    public:
+        ~Slide_Capsule() override {}
+        float m_radius {0.15f};
+        float m_half_height {0.7f};
+    };
 } // namespace Piccolo
