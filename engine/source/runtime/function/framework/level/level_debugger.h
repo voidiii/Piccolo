@@ -1,6 +1,7 @@
 #pragma once
 #include "runtime/function/framework/level/level.h"
 #include "runtime/function/framework/object/object.h"
+#include "runtime/core/math/vector3.h"
 
 namespace Piccolo
 {
