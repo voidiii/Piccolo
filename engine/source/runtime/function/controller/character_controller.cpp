@@ -96,13 +96,18 @@ namespace Piccolo
             //float step_height = -0.5f;
             for(auto hit : hits) {
                 // keep getting the projection along the planes with normals, normalise it for direction only
+                // if the cos is less than zero that means the surface would not affect the slide 
+                if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) {
+                    continue;
+                }
                 silde_direction = silde_direction.project(hit.hit_normal);
                 silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
                 debug_draw_group->addLine(
-                        hit.hit_position, hit.hit_position + hit.hit_normal, Vector4(1.0f, 0.0f, 0.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f), 5.f);
+                            current_position, current_position + hit.hit_normal, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 5.f);
             }
             Vector3 slide_displacement = silde_direction * displacement.dotProduct(silde_direction);
             hits.clear();
+            bool stuck = false;
             if(!physics_scene->sweep(
                 m_rigidbody_shape,
                 world_transform.getMatrix(),
@@ -110,15 +115,20 @@ namespace Piccolo
                 slide_displacement.length(),
                 hits))
             {
-                final_position += slide_displacement;
+                //final_position += slide_displacement;
             } else {
                 for(auto hit : hits) {
-                    debug_draw_group->addLine(
-                        hit.hit_position, hit.hit_position + hit.hit_normal, Vector4(1.0f, 0.0f, 0.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f), 5.f);
                     if (std::abs(hit.hit_normal.z) > 0.9f || std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f) {
-                        final_position += slide_displacement;
+                        //final_position += slide_displacement;
+                    } else {
+                        stuck = true;
+                        debug_draw_group->addLine(
+                            current_position, current_position + slide_displacement * 100.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 5.f);
                     }
                 }
+            }
+            if(!stuck) {
+                final_position += slide_displacement;
             }
         }
         else
