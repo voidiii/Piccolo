@@ -93,8 +93,14 @@ namespace Piccolo
             hits))
         {
             Vector3 silde_direction = horizontal_direction; 
-            //float step_height = -0.5f;
+            Vector3 step_direction = horizontal_direction;
             for(auto hit : hits) {
+                // deal with steps
+                // TODO: STAIR FUNCTION NOT DONE
+                if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) {
+                    step_height = hit.hit_position.z - current_position.z;
+                    m_is_touch_ground = true;
+                }
                 // keep getting the projection along the planes with normals, normalise it for direction only
                 // if the cos is less than zero that means the surface would not affect the slide 
                 if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) {
