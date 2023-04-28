@@ -36,8 +36,8 @@ namespace Piccolo
 
     Vector3 CharacterController::move(const Vector3& current_position, const Vector3& displacement)
     {
-        DebugDrawGroup* debug_draw_group =
-            g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
+        //DebugDrawGroup* debug_draw_group =
+        //    g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
 
         std::shared_ptr<PhysicsScene> physics_scene =
             g_runtime_global_context.m_world_manager->getCurrentActivePhysicsScene().lock();
@@ -102,28 +102,28 @@ namespace Piccolo
                 }
                 silde_direction = silde_direction.project(hit.hit_normal);
                 silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
-                debug_draw_group->addLine(
-                            current_position, current_position + hit.hit_normal, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 5.f);
+                // debug rendering
+                //debug_draw_group->addLine(
+                //            current_position, current_position + hit.hit_normal, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 5.f);
             }
             Vector3 slide_displacement = silde_direction * displacement.dotProduct(silde_direction);
             hits.clear();
             bool stuck = false;
-            if(!physics_scene->sweep(
+            if(physics_scene->sweep(
                 m_rigidbody_shape,
                 world_transform.getMatrix(),
                 silde_direction,
                 slide_displacement.length(),
                 hits))
             {
-                //final_position += slide_displacement;
-            } else {
                 for(auto hit : hits) {
                     if (std::abs(hit.hit_normal.z) > 0.9f || std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f) {
-                        //final_position += slide_displacement;
+                        // the ones that should not affect side movement, do nothing
                     } else {
                         stuck = true;
-                        debug_draw_group->addLine(
-                            current_position, current_position + slide_displacement * 100.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 5.f);
+                        // debug rendering
+                        //debug_draw_group->addLine(
+                        //    current_position, current_position + slide_displacement * 100.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 5.f);
                     }
                 }
             }
