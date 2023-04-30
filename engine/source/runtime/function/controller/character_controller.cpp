@@ -93,23 +93,27 @@ namespace Piccolo
             hits))
         {
             Vector3 silde_direction = horizontal_direction; 
-            Vector3 step_direction = horizontal_direction;
+            // Vector3 step_direction = horizontal_direction;
+            float step_height = 0.f;
             for(auto hit : hits) {
                 // deal with steps
                 // TODO: STAIR FUNCTION NOT DONE
                 if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) {
                     step_height = hit.hit_position.z - current_position.z;
                     m_is_touch_ground = true;
+                    final_position.z += step_height;
                 }
                 // keep getting the projection along the planes with normals, normalise it for direction only
                 // if the cos is less than zero that means the surface would not affect the slide 
-                if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) {
+                else if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) {
                     continue;
+                } else {
+                    silde_direction = silde_direction.project(hit.hit_normal);
+                    silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
                 }
-                silde_direction = silde_direction.project(hit.hit_normal);
-                silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
+                
                 // debug rendering
-                //debug_draw_group->addLine(
+                // debug_draw_group->addLine(
                 //            current_position, current_position + hit.hit_normal, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 5.f);
             }
             Vector3 slide_displacement = silde_direction * displacement.dotProduct(silde_direction);
@@ -128,7 +132,7 @@ namespace Piccolo
                     } else {
                         stuck = true;
                         // debug rendering
-                        //debug_draw_group->addLine(
+                        // debug_draw_group->addLine(
                         //    current_position, current_position + slide_displacement * 100.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 5.f);
                     }
                 }
