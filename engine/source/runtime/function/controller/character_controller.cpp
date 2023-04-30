@@ -36,8 +36,8 @@ namespace Piccolo
 
     Vector3 CharacterController::move(const Vector3& current_position, const Vector3& displacement)
     {
-        //DebugDrawGroup* debug_draw_group =
-        //    g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
+        DebugDrawGroup* debug_draw_group =
+            g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
 
         std::shared_ptr<PhysicsScene> physics_scene =
             g_runtime_global_context.m_world_manager->getCurrentActivePhysicsScene().lock();
@@ -93,15 +93,19 @@ namespace Piccolo
             hits))
         {
             Vector3 silde_direction = horizontal_direction; 
-            // Vector3 step_direction = horizontal_direction;
-            float step_height = 0.f;
+            float step_distance_hor = 0.f;
+            float step_distance_ver = 0.f;
+            float step_displacement_ver = 0.f;
+            bool on_stair = false;
+            bool stuck = false;
             for(auto hit : hits) {
                 // deal with steps
                 // TODO: STAIR FUNCTION NOT DONE
                 if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) {
-                    step_height = hit.hit_position.z - current_position.z;
+                    on_stair = true;
+                    step_distance_hor = Vector2(hit.hit_position.x - current_position.x, hit.hit_position.y - current_position.y).length();
+                    step_distance_ver = hit.hit_position.z - current_position.z;
                     m_is_touch_ground = true;
-                    final_position.z += step_height;
                 }
                 // keep getting the projection along the planes with normals, normalise it for direction only
                 // if the cos is less than zero that means the surface would not affect the slide 
@@ -118,7 +122,7 @@ namespace Piccolo
             }
             Vector3 slide_displacement = silde_direction * displacement.dotProduct(silde_direction);
             hits.clear();
-            bool stuck = false;
+            
             if(physics_scene->sweep(
                 m_rigidbody_shape,
                 world_transform.getMatrix(),
@@ -127,7 +131,10 @@ namespace Piccolo
                 hits))
             {
                 for(auto hit : hits) {
-                    if (std::abs(hit.hit_normal.z) > 0.9f || std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f) {
+                    if (std::abs(hit.hit_normal.z) > 0.9f || 
+                        std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f ||
+                        (hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f))
+                    {
                         // the ones that should not affect side movement, do nothing
                     } else {
                         stuck = true;
@@ -137,8 +144,11 @@ namespace Piccolo
                     }
                 }
             }
-            if(!stuck) {
+            if(!stuck && !on_stair) {
                 final_position += slide_displacement;
+            } else if(!stuck && on_stair) {
+                step_displacement_ver = slide_displacement.length() * (step_distance_ver / step_distance_hor);
+                final_position += slide_displacement + Vector3(0.f, 0.f, step_displacement_ver);
             }
         }
         else
