@@ -36,8 +36,8 @@ namespace Piccolo
 
     Vector3 CharacterController::move(const Vector3& current_position, const Vector3& displacement)
     {
-        DebugDrawGroup* debug_draw_group =
-            g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
+        // DebugDrawGroup* debug_draw_group =
+        //     g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
 
         std::shared_ptr<PhysicsScene> physics_scene =
             g_runtime_global_context.m_world_manager->getCurrentActivePhysicsScene().lock();
@@ -98,20 +98,25 @@ namespace Piccolo
             float step_displacement_ver = 0.f;
             bool on_stair = false;
             bool stuck = false;
-            for(auto hit : hits) {
+            for(auto hit : hits) 
+            {
                 // deal with steps
                 // TODO: STAIR FUNCTION NOT DONE
-                if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) {
+                if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) 
+                {
                     on_stair = true;
                     step_distance_hor = Vector2(hit.hit_position.x - current_position.x, hit.hit_position.y - current_position.y).length();
                     step_distance_ver = hit.hit_position.z - current_position.z;
                     m_is_touch_ground = true;
                 }
-                // keep getting the projection along the planes with normals, normalise it for direction only
-                // if the cos is less than zero that means the surface would not affect the slide 
-                else if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) {
+                else if(Math::cos(silde_direction.angleBetween(hit.hit_normal)) < -0.f) 
+                {
+                    // if the cos is less than zero that means the surface would not affect the slide 
                     continue;
-                } else {
+                } 
+                else 
+                {
+                    // keep getting the projection along the planes with normals, normalise it for direction only
                     silde_direction = silde_direction.project(hit.hit_normal);
                     silde_direction = Vector3(silde_direction.x, silde_direction.y, 0.f).normalisedCopy();
                 }
@@ -130,7 +135,8 @@ namespace Piccolo
                 slide_displacement.length(),
                 hits))
             {
-                for(auto hit : hits) {
+                for(auto hit : hits) 
+                {
                     if (std::abs(hit.hit_normal.z) > 0.9f || 
                         std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f ||
                         (hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f))
@@ -138,16 +144,16 @@ namespace Piccolo
                         // the ones that should not affect side movement, do nothing
                     } else {
                         stuck = true;
-                        // debug rendering
-                        // debug_draw_group->addLine(
-                        //    current_position, current_position + slide_displacement * 100.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(1.0f, 1.0f, 1.0f, 1.0f), 5.f);
                     }
                 }
             }
-            if(!stuck && !on_stair) {
+            if(!stuck && !on_stair) 
+            {
                 final_position += slide_displacement;
-            } else if(!stuck && on_stair) {
-                step_displacement_ver = slide_displacement.length() * (step_distance_ver / step_distance_hor);
+            } 
+            else if(!stuck && on_stair) 
+            {
+                step_displacement_ver = displacement.length() * (step_distance_ver / step_distance_hor); // physically wrong but works, Lets leave it like that shall we
                 final_position += slide_displacement + Vector3(0.f, 0.f, step_displacement_ver);
             }
         }
