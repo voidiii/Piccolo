@@ -71,12 +71,6 @@ namespace Piccolo
 
         if (command >= (unsigned int)GameCommand::invalid)
             return;
-        
-        if (!m_controller->getGroundState() && m_jump_state == JumpState::idle) {
-            m_jump_state = JumpState::falling;
-        } else if (m_controller->getGroundState()) {
-            m_jump_state = JumpState::idle;
-        }
 
         calculatedDesiredHorizontalMoveSpeed(command, delta_time);
         calculatedDesiredVerticalMoveSpeed(command, delta_time);
@@ -85,6 +79,15 @@ namespace Piccolo
         calculateTargetPosition(transform_component->getPosition());
 
         transform_component->setPosition(m_target_position);
+        if (!m_controller->getGroundState() && m_jump_state == JumpState::idle) {
+            m_jump_state = JumpState::falling;
+        } else if (m_controller->getGroundState()) {
+            m_jump_state = JumpState::idle;
+        }
+        LOG_INFO("JUMP STATE: {}", m_jump_state);
+        LOG_INFO("m_controller->getGroundState(): {}", m_controller->getGroundState());
+        LOG_INFO("MOTOR STATE: {}", m_motor_state);
+        LOG_INFO("m_is_moving: {}", m_is_moving);
     }
 
     void MotorComponent::calculatedDesiredHorizontalMoveSpeed(unsigned int command, float delta_time)
@@ -223,6 +226,7 @@ namespace Piccolo
         {
             final_position.z = 0.f;
             m_jump_state     = JumpState::idle;
+            m_controller     ->setGroundState(true);
         }
 
         m_is_moving       = (final_position - current_position).squaredLength() > 0.f;

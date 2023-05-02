@@ -21,6 +21,7 @@ namespace Piccolo
 
         virtual Vector3 move(const Vector3& current_position, const Vector3& displacement) = 0;
         virtual bool getGroundState() = 0;
+        virtual void setGroundState(bool input) = 0;
     };
 
     class CharacterController : public Controller
@@ -31,6 +32,7 @@ namespace Piccolo
 
         Vector3 move(const Vector3& current_position, const Vector3& displacement) override;
         bool getGroundState() { return m_is_touch_ground; };
+        void setGroundState(bool input) { m_is_touch_ground = input; };
 
     private:
         Capsule        m_capsule;

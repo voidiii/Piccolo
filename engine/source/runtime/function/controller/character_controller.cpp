@@ -36,8 +36,8 @@ namespace Piccolo
 
     Vector3 CharacterController::move(const Vector3& current_position, const Vector3& displacement)
     {
-        // DebugDrawGroup* debug_draw_group =
-        //     g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
+        DebugDrawGroup* debug_draw_group =
+            g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("hit physics");
 
         std::shared_ptr<PhysicsScene> physics_scene =
             g_runtime_global_context.m_world_manager->getCurrentActivePhysicsScene().lock();
@@ -64,11 +64,12 @@ namespace Piccolo
             Vector3::NEGATIVE_UNIT_Z,
             0.105f,
             hits);
-        
+
         hits.clear();
 
         world_transform.m_position -= 0.1f * Vector3::UNIT_Z;
 
+        // TODO: there are bugs when charactor is coming down the stairs
         // vertical pass
         if (physics_scene->sweep(
             m_rigidbody_shape,
@@ -77,7 +78,7 @@ namespace Piccolo
             vertical_displacement.length(),
             hits))
         {
-            final_position += hits[0].hit_distance * vertical_direction;
+            final_position += hits[0].hit_distance;
         }
         else
         {
@@ -101,7 +102,6 @@ namespace Piccolo
             for(auto hit : hits) 
             {
                 // deal with steps
-                // TODO: STAIR FUNCTION NOT DONE
                 if(hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) 
                 {
                     on_stair = true;
