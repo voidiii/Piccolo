@@ -72,6 +72,12 @@ namespace Piccolo
         if (command >= (unsigned int)GameCommand::invalid)
             return;
 
+        if (!m_controller->getGroundState() && m_jump_state == JumpState::idle) {
+            m_jump_state = JumpState::falling;
+        } else if (m_controller->getGroundState()) {
+            m_jump_state = JumpState::idle;
+        }
+
         calculatedDesiredHorizontalMoveSpeed(command, delta_time);
         calculatedDesiredVerticalMoveSpeed(command, delta_time);
         calculatedDesiredMoveDirection(command, transform_component->getRotation());
@@ -79,15 +85,6 @@ namespace Piccolo
         calculateTargetPosition(transform_component->getPosition());
 
         transform_component->setPosition(m_target_position);
-        if (!m_controller->getGroundState() && m_jump_state == JumpState::idle) {
-            m_jump_state = JumpState::falling;
-        } else if (m_controller->getGroundState()) {
-            m_jump_state = JumpState::idle;
-        }
-        LOG_INFO("JUMP STATE: {}", m_jump_state);
-        LOG_INFO("m_controller->getGroundState(): {}", m_controller->getGroundState());
-        LOG_INFO("MOTOR STATE: {}", m_motor_state);
-        LOG_INFO("m_is_moving: {}", m_is_moving);
     }
 
     void MotorComponent::calculatedDesiredHorizontalMoveSpeed(unsigned int command, float delta_time)
@@ -202,6 +199,8 @@ namespace Piccolo
         m_desired_displacement =
             m_desired_horizontal_move_direction * m_motor_res.m_move_speed * horizontal_speed_ratio * delta_time +
             Vector3::UNIT_Z * m_vertical_move_speed * delta_time;
+        LOG_INFO("m_desired_displacement: {}", m_desired_displacement.length());
+        LOG_INFO("horizontal_speed_ratio: {}", horizontal_speed_ratio);
     }
 
     void MotorComponent::calculateTargetPosition(const Vector3&& current_position)

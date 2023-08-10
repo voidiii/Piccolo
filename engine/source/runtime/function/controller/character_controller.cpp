@@ -65,6 +65,12 @@ namespace Piccolo
             0.105f,
             hits);
 
+        for(auto hit : hits) 
+        {
+            debug_draw_group->addLine(
+                current_position, current_position + hit.hit_normal, Vector4(1.0f, 1.0f, 1.0f, 1.0f), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 5.f);
+        }
+
         hits.clear();
 
         world_transform.m_position -= 0.1f * Vector3::UNIT_Z;
@@ -78,6 +84,11 @@ namespace Piccolo
             vertical_displacement.length(),
             hits))
         {
+            for(auto hit : hits) 
+            {
+                debug_draw_group->addLine(
+                    current_position, current_position + hit.hit_normal, Vector4(0.0f, 1.0f, 0.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 0.0f), 5.f);
+            }
             final_position += hits[0].hit_distance;
         }
         else
