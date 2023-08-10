@@ -105,6 +105,7 @@ namespace Piccolo
             hits))
         {
             Vector3 silde_direction = horizontal_direction; 
+            Vector3 temp_hit_position = hits[0].hit_position; // for avoid the ghost collision
             float step_distance_hor = 0.f;
             float step_distance_ver = 0.f;
             float step_displacement_ver = 0.f;
@@ -150,7 +151,9 @@ namespace Piccolo
                 {
                     if (std::abs(hit.hit_normal.z) > 0.9f || 
                         std::abs(Math::cos(silde_direction.angleBetween(hit.hit_normal))) < 0.001f ||
-                        (hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f))
+                        (hit.hit_position.z - current_position.z > 0.00001f && hit.hit_position.z - current_position.z < 0.3f) || 
+                        Math::sin(silde_direction.angleBetween(hit.hit_position - temp_hit_position)) < 0.001f // Avoid ghost collision
+                        )
                     {
                         // the ones that should not affect side movement, do nothing
                     } else {
